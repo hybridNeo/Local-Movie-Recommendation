@@ -31,7 +31,7 @@ def clean(raw_list):
 
 def main():
 	omdb.set_default('tomatoes', True)
-	dirname = './'
+	dirname = raw_input("Enter directory")
 	if(len(sys.argv) ==  2):
 		dirname = sys.argv[1]
 	raw_movies = os.listdir(dirname)
