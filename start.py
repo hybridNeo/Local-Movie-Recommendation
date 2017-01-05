@@ -7,23 +7,6 @@ import string
 import re
 reserved = ['EXTENDED','REMASTERD','DIRECTORS','UNRATED','AlTERNATE','1080p','720p','480p','360p','HD','FULL HD','FULLHD','BLURAY','5.1','DUAL AUDIO','DUAL-AUDIO','x264', 'WEB-DL','CH','X264','BrRip','Rip','DVDRip','XviD','[]']
 
-
-#Changelog:
-#Line 07 - Added re module.
-#Line 08 - reserved exponentially expanded.
-#Line 27 - Added remove().
-#Line 51 - Added i.replace() in order to replace dots for spaces.
-#Line 54 - Added else statement with i.split('\0') in order to allow bigger flexibility in folder naming.
-#Line 57 - reserved tags checking system refactored, it now uses remove().
-#Line 60 - Added statement to remove any possible urls from filenames.
-#Line 61 - Same as above, however for diffent url format.
-#Line 67 - Added line break after input message, and input message changed in order to correspond with line 41.
-#Line 68 - Added option to use root directory instead of typing one, therefore, using file current location upon null input.
-#Line 75 - Added two line breaks after 'Retreiving(...)...' message.
-#line 81 - Added space after hyphens.
-#Line 86 - Added output in case of zero movies found.
-#Line 90 - Added raw_input() after code execution, thus keeping it open without the need to run it through console or similar.
-
 def remove(substr, str):
     index = 0
     length = len(substr)
@@ -72,7 +55,7 @@ def main():
 	raw_movies = os.listdir(dirname)
 	print('Cleaning.....')
 	l = clean(raw_movies)
-	print('Retreiving Info... \n \n')
+	print('Retrieving Info... \n \n')
 	info = search(l)
 	sorted_x = sorted(info.items(), key=operator.itemgetter(1))
 	sorted_x = sorted_x[::-1]
