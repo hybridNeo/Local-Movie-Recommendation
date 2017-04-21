@@ -9,6 +9,7 @@ reserved = ['EXTENDED', 'REMASTERD', 'DIRECTORS', 'UNRATED', 'AlTERNATE', '1080p
             'FULL HD', 'FULLHD', 'BLURAY', '5.1', 'DUAL AUDIO', 'DUAL-AUDIO', 'x264', 'WEB-DL', 'CH', 'X264', 'BrRip',
             'Rip', 'DVDRip', 'XviD', '[]']
 
+
 def remove(substr, str):
     index = 0
     length = len(substr)
@@ -16,6 +17,7 @@ def remove(substr, str):
         index = string.find(str, substr)
         str = str[0:index] + str[index+length:]
     return str
+
 
 def search(list):
     dic = {}
@@ -28,6 +30,7 @@ def search(list):
         except:
             err_cnt+=1
     return (dic)
+
 
 def clean(raw_list):
     l = []
@@ -46,6 +49,7 @@ def clean(raw_list):
         cl = re.sub(r'(https|http)?:\/\/(\w|\.|\/|\?|\=|\&|\%)*\b', '', cl, flags=re.MULTILINE)
         l.append(cl)
     return l
+
 
 def main():
     omdb.set_default('tomatoes', True)
