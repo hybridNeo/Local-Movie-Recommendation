@@ -1,6 +1,6 @@
 import sys
 import os
-import omdb
+import omdb  # https://pypi.python.org/pypi/omdb#downloads
 import glob
 import operator
 import string
