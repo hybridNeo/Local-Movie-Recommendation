@@ -35,13 +35,8 @@ def search(list):
 def clean(raw_list):
     movies = []
     for full_movie_name in raw_list:
-        clean_movie_name = full_movie_name
-        full_movie_name = full_movie_name.replace('.', ' ')  # "Shift.HEVC.UNRATED" becomes "Shift HEVC UNRATED"
-        if '(' in clean_movie_name:
-            clean_movie_name = full_movie_name.split('(')  # Convert to list
-        else:
-            clean_movie_name = full_movie_name.split('\0')  # Convert to list
-        clean_movie_name = clean_movie_name[0]  # Convert back to string
+        clean_movie_name = full_movie_name.replace('.', ' ')  # "Shift.HEVC.UNRATED" becomes "Shift HEVC UNRATED"
+
         for reserved_word in reserved:
             if reserved_word in clean_movie_name:
                 name_movie_after_erasure = clean_movie_name.replace(reserved_word, "")
@@ -51,6 +46,7 @@ def clean(raw_list):
         clean_movie_name = re.sub(r'^www.\/\/.*[\r\n]*', '', clean_movie_name, flags=re.MULTILINE)
         clean_movie_name = re.sub(r'(https|http)?:\/\/(\w|\.|\/|\?|\=|\&|\%)*\b', '', clean_movie_name, flags=re.MULTILINE)
         movies.append(clean_movie_name)
+
     return movies
 
 
