@@ -5,6 +5,7 @@ import glob
 import operator
 import string
 import re
+from tkinter.filedialog import *
 
 
 reserved_audio = ['5.1', '7.1', '5 1', '7 1', 'DUAL AUDIO', 'DUAL-AUDIO']
@@ -60,7 +61,7 @@ def clean(raw_list):
 
 def main():
     omdb.set_default('tomatoes', True)
-    dirname = input("Enter directory(Press enter for root): \n")
+    dirname = askdirectory()
 
     if(dirname == ""):
         dirname = os.path.dirname(os.path.realpath(__file__))
