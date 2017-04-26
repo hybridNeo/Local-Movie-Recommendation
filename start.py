@@ -6,8 +6,8 @@ import operator
 import string
 import re
 reserved = ['EXTENDED', 'REMASTERD', 'DIRECTORS', 'UNRATED', 'AlTERNATE', '1080p', '720p', '480p', '360p', 'HD',
-            'FULL HD', 'FULLHD', 'BLURAY', '5.1', 'DUAL AUDIO', 'DUAL-AUDIO', 'x264', 'WEB-DL', 'CH', 'X264', 'BrRip',
-            'Rip', 'DVDRip', 'XviD', '[]']
+            'FULL HD', 'FULLHD', 'BLURAY', '5.1', '7.1', 'DUAL AUDIO', 'DUAL-AUDIO', 'x264', 'WEB-DL', 'CH', 'X264',
+            'HEVC' , 'BrRip', 'Rip', 'DVDRip', 'XviD', '[]', '-aXXo']
 
 
 def remove(substr, str):
@@ -33,39 +33,48 @@ def search(list):
 
 
 def clean(raw_list):
-    l = []
-    for i in raw_list:
-        cl = i
-        i = i.replace('.', ' ')
-        if('(' in cl):
-            cl = i.split('(')
+    movies = []
+    for full_movie_name in raw_list:
+        clean_movie_name = full_movie_name
+        full_movie_name = full_movie_name.replace('.', ' ')  # "Shift.HEVC.UNRATED" becomes "Shift HEVC UNRATED"
+        if '(' in clean_movie_name:
+            clean_movie_name = full_movie_name.split('(')  # Convert to list
         else:
-            cl = i.split('\0')
-        cl = cl[0]
-        for j in reserved:
-            if(j in cl):
-                cl = remove(j, cl)
-        cl = re.sub(r'^www.\/\/.*[\r\n]*', '', cl, flags=re.MULTILINE)
-        cl = re.sub(r'(https|http)?:\/\/(\w|\.|\/|\?|\=|\&|\%)*\b', '', cl, flags=re.MULTILINE)
-        l.append(cl)
-    return l
+            clean_movie_name = full_movie_name.split('\0')  # Convert to list
+        clean_movie_name = clean_movie_name[0]  # Convert back to string
+        for reserved_word in reserved:
+            if reserved_word in clean_movie_name:
+                name_movie_after_erasure = clean_movie_name.replace(reserved_word, "")
+                clean_movie_name = name_movie_after_erasure
+
+        # Regex
+        clean_movie_name = re.sub(r'^www.\/\/.*[\r\n]*', '', clean_movie_name, flags=re.MULTILINE)
+        clean_movie_name = re.sub(r'(https|http)?:\/\/(\w|\.|\/|\?|\=|\&|\%)*\b', '', clean_movie_name, flags=re.MULTILINE)
+        movies.append(clean_movie_name)
+    return movies
 
 
 def main():
     omdb.set_default('tomatoes', True)
     dirname = input("Enter directory(Press enter for root): \n")
+
     if(dirname == ""):
         dirname = os.path.dirname(os.path.realpath(__file__))
     if(len(sys.argv) ==  2):
         dirname = sys.argv[1]
+
     raw_movies = os.listdir(dirname)
+
     print('Cleaning.....')
     l = clean(raw_movies)
+
     print('Retrieving Info... \n \n')
     info = search(l)
+
     sorted_x = sorted(info.items(), key=operator.itemgetter(1))
     sorted_x = sorted_x[::-1]
     found = 0
+
     for i in sorted_x:
         print(i[0]+ ' --------------- ' + str(i[1]))
         found = found+1
