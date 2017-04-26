@@ -8,8 +8,8 @@ import re
 from tkinter.filedialog import *
 
 
-reserved_audio = ['5.1', '7.1', '5 1', '7 1', 'DUAL AUDIO', 'DUAL-AUDIO']
-reserved_video = ['2160p', '4K',  '1080p', '720p', '480p', '360p', 'HD', 'FULL HD', 'FULLHD']
+reserved_audio = ['5.1', '7.1', '5 1', '7 1', 'DUAL AUDIO', 'DUAL-AUDIO', 'MULTI-CHANNEL', 'Ita-Eng']
+reserved_video = ['2160p', '4K', '1080p', '720p', '480p', '360p', 'HD', 'FULL HD', 'FULLHD']
 reserved_codecs = ['x264', 'CH', 'X264', 'HEVC']
 reserved_medium = ['WEB-DL', 'BrRip', 'Rip', 'DVDRip', 'XviD', 'BLURAY']
 reserved_keywords = ['EXTENDED', 'REMASTERED', 'DIRECTORS', 'UNRATED', 'AlTERNATE']
@@ -92,3 +92,7 @@ def main():
 if __name__ == '__main__':
     main()
     input("\n Press any key to exit")
+
+    '''TO DO: 
+    After program gets all ratings, show it in new GUI window.
+    '''
