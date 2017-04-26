@@ -5,9 +5,14 @@ import glob
 import operator
 import string
 import re
-reserved = ['EXTENDED', 'REMASTERD', 'DIRECTORS', 'UNRATED', 'AlTERNATE', '1080p', '720p', '480p', '360p', 'HD',
-            'FULL HD', 'FULLHD', 'BLURAY', '5.1', '7.1', '5 1', '7 1', 'DUAL AUDIO', 'DUAL-AUDIO', 'x264', 'WEB-DL',
-            'CH', 'X264', 'HEVC' , 'BrRip', 'Rip', 'DVDRip', 'XviD', '[]', '-aXXo']
+
+
+reserved_audio = ['5.1', '7.1', '5 1', '7 1', 'DUAL AUDIO', 'DUAL-AUDIO']
+reserved_video = ['2160p', '4K',  '1080p', '720p', '480p', '360p', 'HD', 'FULL HD', 'FULLHD']
+reserved_codecs = ['x264', 'CH', 'X264', 'HEVC']
+reserved_medium = ['WEB-DL', 'BrRip', 'Rip', 'DVDRip', 'XviD', 'BLURAY']
+reserved_keywords = ['EXTENDED', 'REMASTERED', 'DIRECTORS', 'UNRATED', 'AlTERNATE']
+reserved_other = ['[]', '-aXXo']
 
 
 def remove(substr, str):
@@ -34,10 +39,13 @@ def search(list):
 
 def clean(raw_list):
     movies = []
+    reserved_words = reserved_audio + reserved_video + reserved_codecs + reserved_medium + \
+                     reserved_keywords + reserved_other
+
     for full_movie_name in raw_list:
         clean_movie_name = full_movie_name.replace('.', ' ')  # "Shift.HEVC.UNRATED" becomes "Shift HEVC UNRATED"
 
-        for reserved_word in reserved:
+        for reserved_word in reserved_words:
             if reserved_word in clean_movie_name:
                 name_movie_after_erasure = clean_movie_name.replace(reserved_word, "")
                 clean_movie_name = name_movie_after_erasure
