@@ -5,7 +5,11 @@ import glob
 import operator
 import string
 import re
+
+import tkinter
 from tkinter.filedialog import *
+
+
 
 
 reserved_audio = ['5.1', '7.1', '5 1', '7 1', 'DUAL AUDIO', 'DUAL-AUDIO', 'MULTI-CHANNEL', 'Ita-Eng']
@@ -61,14 +65,34 @@ def clean(raw_list):
 
 def main():
     omdb.set_default('tomatoes', True)
-    dirname = askdirectory()
 
+    top_window = tkinter.Tk() # Main window of application.
+
+
+    ''' Causing a widget to appear requires that you position it using with what Tkinter calls "geometry managers". 
+    The three managers are grid, pack and place. '''
+
+    #additional_window = Toplevel()
+
+    label = Label(top_window, text = "Please choose a folder with movies.", relief = RAISED, padx = 25)
+    label.pack()
+    label.grid(row = 50, column = 1000)
+
+
+    #label.destroy()
+    top_window.mainloop()
+
+
+    return
+
+    dirname = askdirectory()
     if(dirname == ""):
         dirname = os.path.dirname(os.path.realpath(__file__))
     if(len(sys.argv) ==  2):
         dirname = sys.argv[1]
 
     raw_movies = os.listdir(dirname)
+
 
     print('Cleaning.....')
     l = clean(raw_movies)
@@ -81,17 +105,16 @@ def main():
     found = 0
 
     for i in sorted_x:
-        print(i[0]+ ' --------------- ' + str(i[1]))
-        found = found+1
+        print(i[0] + ' --------------- ' + str(i[1]))
+        found = found + 1
     # search = omdb.title('The Matrix')
     # print(search.imdb_rating)
     # print(search.tomato_rating)
-    if(found == 0):
+    if found == 0:
         print("No movies were found\nPlease check directory or file names")
 
 if __name__ == '__main__':
     main()
-    input("\n Press any key to exit")
 
     '''TO DO: 
     After program gets all ratings, show it in new GUI window.
