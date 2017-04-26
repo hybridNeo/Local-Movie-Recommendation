@@ -6,8 +6,8 @@ import operator
 import string
 import re
 reserved = ['EXTENDED', 'REMASTERD', 'DIRECTORS', 'UNRATED', 'AlTERNATE', '1080p', '720p', '480p', '360p', 'HD',
-            'FULL HD', 'FULLHD', 'BLURAY', '5.1', '7.1', 'DUAL AUDIO', 'DUAL-AUDIO', 'x264', 'WEB-DL', 'CH', 'X264',
-            'HEVC' , 'BrRip', 'Rip', 'DVDRip', 'XviD', '[]', '-aXXo']
+            'FULL HD', 'FULLHD', 'BLURAY', '5.1', '7.1', '5 1', '7 1', 'DUAL AUDIO', 'DUAL-AUDIO', 'x264', 'WEB-DL',
+            'CH', 'X264', 'HEVC' , 'BrRip', 'Rip', 'DVDRip', 'XviD', '[]', '-aXXo']
 
 
 def remove(substr, str):
