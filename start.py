@@ -41,7 +41,10 @@ def get_movies_info(movie_list):
         except:
             err_cnt += 1
 
-    return ratings
+    movie_informations = {'Ratings': ratings, 'Box_office': box_office, 'Release_date': release_date, 'Length': length,
+                           'Votes_number': votes_number, 'Full_title': full_title}
+    #return ratings
+    return movie_informations
 
 
 def clean(raw_list):
@@ -123,6 +126,14 @@ class GUI_Manager:
 
 
 def main():
+
+    # words = { 1: "Ola", 5: "Michal" }
+    # another = { 7: "Robert", 4: "Patryk" }
+    #
+    # sumka = { 'Wordens': words, 'Anotheren': another }
+    # print(sumka['Anotheren'][7])  # This is how to connect all dicts in one! :)
+
+
     omdb.set_default('tomatoes', True)
 
     manager = GUI_Manager()
@@ -139,22 +150,33 @@ def main():
     movie_list = clean(raw_movies)
 
     print('Retrieving Info... \n \n')
-    movie_informations = get_movies_info(movie_list)
+    movies_informations = get_movies_info(movie_list)
 
-    movie_informations = sorted(movie_informations.items(), key=operator.itemgetter(1), reverse=True)
+    movies_ratings = sorted(movies_informations['Ratings'].items(), key=operator.itemgetter(1), reverse=True)
+    movies_box_office = sorted(movies_informations['Box_office'].items(), key=operator.itemgetter(1), reverse=True)
 
-    for movie_rating in movie_informations:
+    for movie_rating in movies_ratings:
         print(movie_rating[0] + ' --------------- ' + str(movie_rating[1]))
+
+    for movie_money in movies_box_office:
+        print(movie_money[0] + ' --------------- ' + str(movie_money[1]))
 
     # get_movies_info = omdb.title('The Matrix')
     # print(get_movies_info.imdb_rating)
     # print(get_movies_info.tomato_rating)
 
-    if not movie_informations:
+    if not movies_informations:
         print("No movies were found\nPlease check directory or file names")
+
+
+
 
 if __name__ == '__main__':
     main()
+
+
+
+
 
     '''TO DO: 
     1. After program gets all ratings, show it in new GUI window.
