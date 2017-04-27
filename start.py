@@ -61,53 +61,76 @@ def clean(raw_list):
 
     return movies
 
-def Convert_Coordinates_To_String(x_coordinate, y_coordinate):
-    coordinates_as_string = "+" + str(x_coordinate) + "+" + str(y_coordinate)
-    return coordinates_as_string
+
+class GUI_Manager:
+
+    def convert_coordinates_to_string(self, x=0, y=0):
+        coordinates_as_string = "+" + str(self.x_coordinate + x) + "+" + str(self.y_coordinate + y)
+        return coordinates_as_string
+
+    def set_root_window(self):
+        self.top_window.withdraw()  # Hide main window. Call deiconify() to make it visible again.
+        self.top_window.geometry(self.convert_coordinates_to_string())
+
+    def set_additional_window(self):
+
+        # Additional window is created so that label can bind to it. It needs to be a little bit higher then
+        # opening folder Dialog, so the text on label is visible.
+        above_file_dialog_coordinate = - 25
+        self.additional_window.geometry(self.convert_coordinates_to_string(y=above_file_dialog_coordinate))
+
+    def set_label_options(self):
+        self.label_options['foreground'] = "blue"
+        self.label_options['background'] = "white"
+
+    def set_browser_options(self):
+        self.browser_options['initialdir'] = "C:\\"  # Specifies which directory should be displayed when the dialog pops up.
+        self.browser_options['title'] = "Select folder with movies"
+
+    def set_label(self):
+        self.label.configure(**self.label_options)
+        self.label.pack()  # This geometry manager organizes widgets in blocks before placing them in the parent widget.
+
+    def open_folder_browser(self):
+        return tkinter.filedialog.askdirectory(**self.browser_options)  # TO DO: return dirname = tkinter.filedialog.askdirectory(**browser_options)
+
+    def get_folder_path(self):
+        return self.dirname
+
+    def __init__(self):
+        self.x_coordinate = 0
+        self.y_coordinate = 100
+
+        self.top_window = tkinter.Tk()
+        self.additional_window = Toplevel()
+        self.label = Label(self.additional_window, text = "Please choose a folder with movies.", relief = RAISED,
+                           padx = 25)
+
+        self.label_options = {}
+        self.browser_options = {}
+
+        self.set_root_window()
+        self.set_additional_window()
+
+        self.set_label_options()
+        self.set_label()
+
+        self.set_browser_options()
+        self.dirname = self.open_folder_browser()
 
 
 def main():
     omdb.set_default('tomatoes', True)
 
-    ''' TOP WINDOW '''
-    top_window = tkinter.Tk()  # Main window of application.
-    top_window.withdraw()  # Hide main window. Call deiconify() to make it visible again.
+    manager = GUI_Manager()
+    directory_path = manager.get_folder_path()
 
-    x_coordinate = 0
-    y_coordinate = 100
-    coordinates_as_string = Convert_Coordinates_To_String(x_coordinate, y_coordinate)  # Looks like "+500+100"
-    top_window.geometry(coordinates_as_string)
-    ''' '''
+    if directory_path == "":
+        directory_path = os.path.dirname(os.path.realpath(__file__))
+    if len(sys.argv) == 2:
+        directory_path = sys.argv[1]
 
-    ''' PUT LABEL ON TO THE OTHER WINDOW '''
-    additional_window = Toplevel()
-    coordinates_as_string = Convert_Coordinates_To_String(x_coordinate, y_coordinate - 25)
-    additional_window.geometry(coordinates_as_string)
-
-    label = Label(additional_window, text = "Please choose a folder with movies.", relief = RAISED, padx = 25)
-    label_options = {}
-    label_options['foreground'] = "blue"
-    label_options['background'] = "white"
-    label.configure(**label_options)
-    label.pack()  # This geometry manager organizes widgets in blocks before placing them in the parent widget.
-    ''' '''
-
-    browser_options = {}
-    browser_options['initialdir'] = "C:\\"  # Specifies which directory should be displayed when the dialog pops up.
-    browser_options['title'] = "Select folder with movies"
-
-    dirname = tkinter.filedialog.askdirectory(**browser_options)
-
-    #top_window.destroy()
-    #top_window.mainloop()  # Unneceasary for now - when user choses folder we must switch off GUI for the time of searching.
-
-
-    if(dirname == ""):
-        dirname = os.path.dirname(os.path.realpath(__file__))
-    if(len(sys.argv) ==  2):
-        dirname = sys.argv[1]
-
-    raw_movies = os.listdir(dirname)
+    raw_movies = os.listdir(directory_path)
 
 
     print('Cleaning.....')
