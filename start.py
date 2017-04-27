@@ -26,6 +26,7 @@ def get_movies_info(movie_list):
     length = {}
     votes_number = {}
     full_title = {}
+    movies_not_recognized = []
 
     err_cnt = 0
     for movie_name in movie_list:
@@ -38,12 +39,13 @@ def get_movies_info(movie_list):
                 length[movie_name] = movie.runtime
                 votes_number[movie_name] = movie.imdb_votes
                 full_title[movie_name] = movie.title
+            else:
+                movies_not_recognized.append(movie_name)
         except:
             err_cnt += 1
 
     movie_informations = {'Ratings': ratings, 'Box_office': box_office, 'Release_date': release_date, 'Length': length,
-                           'Votes_number': votes_number, 'Full_title': full_title}
-    #return ratings
+                           'Votes_number': votes_number, 'Full_title': full_title, 'Not_recognized': movies_not_recognized}
     return movie_informations
 
 
@@ -126,14 +128,6 @@ class GUI_Manager:
 
 
 def main():
-
-    # words = { 1: "Ola", 5: "Michal" }
-    # another = { 7: "Robert", 4: "Patryk" }
-    #
-    # sumka = { 'Wordens': words, 'Anotheren': another }
-    # print(sumka['Anotheren'][7])  # This is how to connect all dicts in one! :)
-
-
     omdb.set_default('tomatoes', True)
 
     manager = GUI_Manager()
@@ -154,16 +148,20 @@ def main():
 
     movies_ratings = sorted(movies_informations['Ratings'].items(), key=operator.itemgetter(1), reverse=True)
     movies_box_office = sorted(movies_informations['Box_office'].items(), key=operator.itemgetter(1), reverse=True)
+    movies_not_recognized = movies_informations['Not_recognized']
 
+    print("\nRatings: \n")
     for movie_rating in movies_ratings:
-        print(movie_rating[0] + ' --------------- ' + str(movie_rating[1]))
+        print(movie_rating[0] + ' : ' + str(movie_rating[1]))
 
+    print("\nBox office: \n")
     for movie_money in movies_box_office:
-        print(movie_money[0] + ' --------------- ' + str(movie_money[1]))
+        print(movie_money[0] + ' : ' + str(movie_money[1]))
 
-    # get_movies_info = omdb.title('The Matrix')
-    # print(get_movies_info.imdb_rating)
-    # print(get_movies_info.tomato_rating)
+    if movies_not_recognized:
+        print("\nNot recognized movies: \n")
+        for movie_name in movies_not_recognized:
+            print (movie_name)
 
     if not movies_informations:
         print("No movies were found\nPlease check directory or file names")
@@ -173,6 +171,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+    input("\n Press any key to exit")
 
 
 
