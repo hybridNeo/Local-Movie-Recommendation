@@ -8,8 +8,7 @@ import re
 
 import tkinter
 from tkinter.filedialog import *
-
-
+from tkinter import filedialog
 
 
 reserved_audio = ['5.1', '7.1', '5 1', '7 1', 'DUAL AUDIO', 'DUAL-AUDIO', 'MULTI-CHANNEL', 'Ita-Eng']
@@ -66,26 +65,37 @@ def clean(raw_list):
 def main():
     omdb.set_default('tomatoes', True)
 
-    top_window = tkinter.Tk() # Main window of application.
+    ''' TOP WINDOW '''
+    top_window = tkinter.Tk()  # Main window of application.
 
+    x_coordinate = 0
+    y_coordinate = 0
+    coordinates_as_string = "+" + str(x_coordinate) + "+" + str(y_coordinate)  # Looks like "+500+100"
+    top_window.geometry(coordinates_as_string)
+    ''' '''
 
     ''' Causing a widget to appear requires that you position it using with what Tkinter calls "geometry managers". 
     The three managers are grid, pack and place. '''
 
-    #additional_window = Toplevel()
-
     label = Label(top_window, text = "Please choose a folder with movies.", relief = RAISED, padx = 25)
-    label.pack()
-    label.grid(row = 50, column = 1000)
+    label.pack()  # This geometry manager organizes widgets in blocks before placing them in the parent widget.
+    #label.grid(row = 50, column = 1000)  # This geometry manager organizes widgets in a table-like structure in the parent widget.
 
 
     #label.destroy()
-    top_window.mainloop()
 
+    options = {}
+    options['parent'] = top_window
+    options['initialdir'] = "C:\\"  # Specifies which directory should be displayed when the dialog pops up.
+    options['title'] = "Select folder with movies"
+    dirname = tkinter.filedialog.askdirectory(**options)
+    #dirname = tkinter.filedialog.askdirectory()
 
-    return
+    #top_window.destroy()
+    #top_window.mainloop() # Unnecesarry for now - when user choses folder we must switch off GUI for the time of searching.
 
-    dirname = askdirectory()
+    #return
+
     if(dirname == ""):
         dirname = os.path.dirname(os.path.realpath(__file__))
     if(len(sys.argv) ==  2):
@@ -117,5 +127,38 @@ if __name__ == '__main__':
     main()
 
     '''TO DO: 
-    After program gets all ratings, show it in new GUI window.
+    1. After program gets all ratings, show it in new GUI window.
+    2. Make it multithreading, so 1 thread shows GUI in mainloop() and second thread works on everything else.
+    3. Allow user to select multiple folders. (tkFileDialog has "multiple" option)
     '''
+
+    # screen_width = top_window.winfo_screenwidth()
+    # screen_height = top_window.winfo_screenheight()
+    # top_window.geometry('%dx%d+%d+%d' % (screen_width, screen_height, x_coordinate, y_coordinate))
+
+    #label.place(x = 1)
+
+    #additional_window = Toplevel()
+
+''' 
+The package Tkinter has been renamed to tkinter in Python 3, as well as other modules related to it. 
+Here are the name changes:
+
+Tkinter → tkinter
+tkMessageBox → tkinter.messagebox
+tkColorChooser → tkinter.colorchooser
+tkFileDialog → tkinter.filedialog
+tkCommonDialog → tkinter.commondialog
+tkSimpleDialog → tkinter.simpledialog
+tkFont → tkinter.font
+Tkdnd → tkinter.dnd
+ScrolledText → tkinter.scrolledtext
+Tix → tkinter.tix
+ttk → tkinter.ttk
+ 
+ 
+ 
+ https://bytes.com/topic/python/answers/908537-can-window-size-tffiledialog-changed
+ http://stackoverflow.com/questions/21558028/how-to-change-window-size-of-tkfiledialog-askdirectory
+ 
+'''
