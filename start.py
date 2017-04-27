@@ -19,26 +19,29 @@ reserved_keywords = ['EXTENDED', 'REMASTERED', 'DIRECTORS', 'UNRATED', 'AlTERNAT
 reserved_other = ['[]', '-aXXo']
 
 
-def remove(substr, str):
-    index = 0
-    length = len(substr)
-    while string.find(str, substr) != -1:
-        index = string.find(str, substr)
-        str = str[0:index] + str[index+length:]
-    return str
+def get_movies_info(movie_list):
+    ratings = {}
+    box_office = {}
+    release_date = {}
+    length = {}
+    votes_number = {}
+    full_title = {}
 
-
-def search(list):
-    dic = {}
     err_cnt = 0
-    for i in list:
+    for movie_name in movie_list:
         try:
-            obj = omdb.title(i)
-            if(obj != []):
-                dic[i] = obj.imdb_rating
+            movie = omdb.title(movie_name)
+            if movie:
+                ratings[movie_name] = movie.imdb_rating
+                box_office[movie_name] = movie.box_office
+                release_date[movie_name] = movie.released
+                length[movie_name] = movie.runtime
+                votes_number[movie_name] = movie.imdb_votes
+                full_title[movie_name] = movie.title
         except:
-            err_cnt+=1
-    return (dic)
+            err_cnt += 1
+
+    return ratings
 
 
 def clean(raw_list):
@@ -65,7 +68,7 @@ def clean(raw_list):
 class GUI_Manager:
 
     def convert_coordinates_to_string(self, x=0, y=0):
-        coordinates_as_string = "+" + str(self.x_coordinate + x) + "+" + str(self.y_coordinate + y)
+        coordinates_as_string = "+" + str(self._x_coordinate + x) + "+" + str(self._y_coordinate + y)
         return coordinates_as_string
 
     def set_root_window(self):
@@ -73,7 +76,6 @@ class GUI_Manager:
         self.top_window.geometry(self.convert_coordinates_to_string())
 
     def set_additional_window(self):
-
         # Additional window is created so that label can bind to it. It needs to be a little bit higher then
         # opening folder Dialog, so the text on label is visible.
         above_file_dialog_coordinate = - 25
@@ -92,19 +94,19 @@ class GUI_Manager:
         self.label.pack()  # This geometry manager organizes widgets in blocks before placing them in the parent widget.
 
     def open_folder_browser(self):
-        return tkinter.filedialog.askdirectory(**self.browser_options)  # TO DO: return dirname = tkinter.filedialog.askdirectory(**browser_options)
+        return tkinter.filedialog.askdirectory(**self.browser_options)
 
     def get_folder_path(self):
-        return self.dirname
+        return self.directory_path
 
     def __init__(self):
-        self.x_coordinate = 0
-        self.y_coordinate = 100
+        self._x_coordinate = 0
+        self._y_coordinate = 100
 
         self.top_window = tkinter.Tk()
         self.additional_window = Toplevel()
-        self.label = Label(self.additional_window, text = "Please choose a folder with movies.", relief = RAISED,
-                           padx = 25)
+        self.label = Label(self.additional_window, text = "Please choose a folder with movies.",
+                           relief = RAISED, padx = 25)
 
         self.label_options = {}
         self.browser_options = {}
@@ -116,7 +118,8 @@ class GUI_Manager:
         self.set_label()
 
         self.set_browser_options()
-        self.dirname = self.open_folder_browser()
+
+        self.directory_path = self.open_folder_browser()
 
 
 def main():
@@ -132,24 +135,22 @@ def main():
 
     raw_movies = os.listdir(directory_path)
 
-
     print('Cleaning.....')
-    l = clean(raw_movies)
+    movie_list = clean(raw_movies)
 
     print('Retrieving Info... \n \n')
-    info = search(l)
+    movie_informations = get_movies_info(movie_list)
 
-    sorted_x = sorted(info.items(), key=operator.itemgetter(1))
-    sorted_x = sorted_x[::-1]
-    found = 0
+    movie_informations = sorted(movie_informations.items(), key=operator.itemgetter(1), reverse=True)
 
-    for i in sorted_x:
-        print(i[0] + ' --------------- ' + str(i[1]))
-        found = found + 1
-    # search = omdb.title('The Matrix')
-    # print(search.imdb_rating)
-    # print(search.tomato_rating)
-    if found == 0:
+    for movie_rating in movie_informations:
+        print(movie_rating[0] + ' --------------- ' + str(movie_rating[1]))
+
+    # get_movies_info = omdb.title('The Matrix')
+    # print(get_movies_info.imdb_rating)
+    # print(get_movies_info.tomato_rating)
+
+    if not movie_informations:
         print("No movies were found\nPlease check directory or file names")
 
 if __name__ == '__main__':
