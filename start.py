@@ -61,40 +61,46 @@ def clean(raw_list):
 
     return movies
 
+def Convert_Coordinates_To_String(x_coordinate, y_coordinate):
+    coordinates_as_string = "+" + str(x_coordinate) + "+" + str(y_coordinate)
+    return coordinates_as_string
+
 
 def main():
     omdb.set_default('tomatoes', True)
 
     ''' TOP WINDOW '''
     top_window = tkinter.Tk()  # Main window of application.
+    top_window.withdraw()  # Hide main window. Call deiconify() to make it visible again.
 
     x_coordinate = 0
-    y_coordinate = 0
-    coordinates_as_string = "+" + str(x_coordinate) + "+" + str(y_coordinate)  # Looks like "+500+100"
+    y_coordinate = 100
+    coordinates_as_string = Convert_Coordinates_To_String(x_coordinate, y_coordinate)  # Looks like "+500+100"
     top_window.geometry(coordinates_as_string)
     ''' '''
 
-    ''' Causing a widget to appear requires that you position it using with what Tkinter calls "geometry managers". 
-    The three managers are grid, pack and place. '''
+    ''' PUT LABEL ON TO THE OTHER WINDOW '''
+    additional_window = Toplevel()
+    coordinates_as_string = Convert_Coordinates_To_String(x_coordinate, y_coordinate - 25)
+    additional_window.geometry(coordinates_as_string)
 
-    label = Label(top_window, text = "Please choose a folder with movies.", relief = RAISED, padx = 25)
+    label = Label(additional_window, text = "Please choose a folder with movies.", relief = RAISED, padx = 25)
+    label_options = {}
+    label_options['foreground'] = "blue"
+    label_options['background'] = "white"
+    label.configure(**label_options)
     label.pack()  # This geometry manager organizes widgets in blocks before placing them in the parent widget.
-    #label.grid(row = 50, column = 1000)  # This geometry manager organizes widgets in a table-like structure in the parent widget.
+    ''' '''
 
+    browser_options = {}
+    browser_options['initialdir'] = "C:\\"  # Specifies which directory should be displayed when the dialog pops up.
+    browser_options['title'] = "Select folder with movies"
 
-    #label.destroy()
-
-    options = {}
-    options['parent'] = top_window
-    options['initialdir'] = "C:\\"  # Specifies which directory should be displayed when the dialog pops up.
-    options['title'] = "Select folder with movies"
-    dirname = tkinter.filedialog.askdirectory(**options)
-    #dirname = tkinter.filedialog.askdirectory()
+    dirname = tkinter.filedialog.askdirectory(**browser_options)
 
     #top_window.destroy()
-    #top_window.mainloop() # Unnecesarry for now - when user choses folder we must switch off GUI for the time of searching.
+    #top_window.mainloop()  # Unneceasary for now - when user choses folder we must switch off GUI for the time of searching.
 
-    #return
 
     if(dirname == ""):
         dirname = os.path.dirname(os.path.realpath(__file__))
@@ -130,15 +136,13 @@ if __name__ == '__main__':
     1. After program gets all ratings, show it in new GUI window.
     2. Make it multithreading, so 1 thread shows GUI in mainloop() and second thread works on everything else.
     3. Allow user to select multiple folders. (tkFileDialog has "multiple" option)
+    4. Get size of File Dialog Windows in Windows and make label centered above this dialog. Links below.
     '''
 
     # screen_width = top_window.winfo_screenwidth()
     # screen_height = top_window.winfo_screenheight()
     # top_window.geometry('%dx%d+%d+%d' % (screen_width, screen_height, x_coordinate, y_coordinate))
 
-    #label.place(x = 1)
-
-    #additional_window = Toplevel()
 
 ''' 
 The package Tkinter has been renamed to tkinter in Python 3, as well as other modules related to it. 
@@ -155,10 +159,17 @@ Tkdnd → tkinter.dnd
 ScrolledText → tkinter.scrolledtext
 Tix → tkinter.tix
 ttk → tkinter.ttk
- 
- 
- 
- https://bytes.com/topic/python/answers/908537-can-window-size-tffiledialog-changed
- http://stackoverflow.com/questions/21558028/how-to-change-window-size-of-tkfiledialog-askdirectory
- 
 '''
+
+''' 
+Causing a widget to appear requires that you position it using with what Tkinter calls "geometry managers". 
+The three managers are grid, pack and place.
+'''
+# label.grid(row = 50, column = 1000)  # This geometry manager organizes widgets in a table-like structure in the parent widget.
+# label.place(x = 1)
+
+ # https://bytes.com/topic/python/answers/908537-can-window-size-tffiledialog-changed
+ # http://stackoverflow.com/questions/21558028/how-to-change-window-size-of-tkfiledialog-askdirectory
+
+
+
