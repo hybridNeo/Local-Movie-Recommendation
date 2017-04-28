@@ -7,8 +7,10 @@ import string
 import re
 
 import tkinter
+import tkinter.messagebox
 from tkinter.filedialog import *
 from tkinter import filedialog
+
 
 
 reserved_audio = ['5.1', '7.1', '5 1', '7 1', 'DUAL AUDIO', 'DUAL-AUDIO', 'MULTI-CHANNEL', 'Ita-Eng']
@@ -83,51 +85,74 @@ class GUI_Manager:
         self.top_window.withdraw()  # Hide main window. Call deiconify() to make it visible again.
         self.top_window.geometry(self.convert_coordinates_to_string(x=self._x_coordinate, y=self._y_coordinate))
 
-    def set_additional_window(self):
-        """ 
-        Additional window is created so that label can bind to it. 
-        It needs to be a little bit higher then opening folder Dialog, so the text on label is visible.
-        It could also be placed on center of the screen and have a button "Ok" which would hide it.
-        """
-        screen_width = self.additional_window.winfo_screenwidth()
-        screen_height = self.additional_window.winfo_screenheight()
-        center_screen_place = self.convert_coordinates_to_string(screen_width / 2, screen_height/2)
-        # self.additional_window.geometry(center_screen_place)
-        self.additional_window.geometry("+720+480")
-
-        self.additional_window.lift()
-        self.additional_window.attributes("-topmost", True)
-
     def set_browser_options(self):
         self.browser_options['initialdir'] = "C:\\"  # Specifies which directory should be displayed when the dialog pops up.
         self.browser_options['title'] = "Select folder with movies"
 
     def open_folder_browser(self):
-        self.additional_window = Toplevel()
-        self.set_additional_window()
-        self.label = LabelFactory(self.additional_window, "Please choose a folder with movies.",
-                                   {'foreground': "blue", "background": "white"})
-
         directory_path = tkinter.filedialog.askdirectory(**self.browser_options)
-        self.additional_window.destroy()
         return directory_path
 
     def get_folder_path(self):
         self.directory_path = self.open_folder_browser()
         return self.directory_path
 
-    def Show_Movie_Informations(self):
+    def show_ratings(self, movies_information):
+        rating_label = Label(self.top_window, text="Ratings")
+        rating_label.grid(row = 0, column = self._column)
+
+        rating_list = Listbox(self.top_window)
+        rating_list.grid(row = 1, column = self._column)
+
+        self._column += 1
+
+        movies_ratings = sorted(movies_information['Ratings'].items(), key=operator.itemgetter(1), reverse=True)
+        for movie_rating in movies_ratings:
+            rating_list.insert(END, str(movie_rating[0] + ': ' + str(movie_rating[1])))
+
+    def show_box_office(self, movies_information):
+        box_office_label = Label(self.top_window, text="Box Office")
+        box_office_label.grid(row = 0, column = self._column)
+
+        box_office_list = Listbox(self.top_window)
+        box_office_list.grid(row = 1, column = self._column)
+
+        self._column += 1
+
+        movies_box_office = sorted(movies_information['Box_office'].items(), key=operator.itemgetter(1), reverse=True)
+        for movie_money in movies_box_office:
+            box_office_list.insert(END, str(movie_money[0] + ': ' + str(movie_money[1])))
+
+    def show_length(self, movies_information):
+        length_label = Label(self.top_window, text="Length")
+        length_label.grid(row = 0, column = self._column)
+
+        length_list = Listbox(self.top_window)
+        length_list.grid(row = 1, column = self._column)
+
+        self._column += 1
+
+        movies_length = sorted(movies_information['Length'].items(), key=operator.itemgetter(1), reverse=True)
+        for movie_length in movies_length:
+            length_list.insert(END, str(movie_length[0] + ': ' + str(movie_length[1])))
+
+    def Show_Movie_Informations(self, movies_information):
         self.top_window.deiconify()
+
+        self.show_ratings(movies_information)
+        self.show_box_office(movies_information)
+        self.show_length(movies_information)
+
+        self.top_window.mainloop()
 
     def __init__(self):
         self._x_coordinate = 900  # Near center ;d TODO: Change it to proper center.
         self._y_coordinate = 500
 
+        self._column = 0
+
         self.top_window = tkinter.Tk()
         self.set_root_window()
-
-        self.additional_window = None
-        self.label = None
 
         self.browser_options = {}
         self.set_browser_options()
@@ -135,18 +160,30 @@ class GUI_Manager:
         self.directory_path = ""
 
 
-class LabelFactory(Label):
-    def __init__(self, window_to_bind, label_text, options):
-        self.label = Label(window_to_bind, text = label_text, relief = RAISED, padx = 25)
-        self.label.configure(**options)
-        self.label.pack()
-
-
-
 
 
 
 def main():
+    # top_window = Tk()
+    #
+    # rating_label = Label(top_window, text="Ratings")
+    # rating_label.grid(row=0, column=0)
+    #
+    # rating_list = Listbox(top_window)
+    # rating_list.grid(row=1, column=0)
+    # rating_list.insert(1, "Benzema")
+    #
+    # box_office_label = Label(top_window, text="Box Office")
+    # box_office_label.grid(row=0, column=1)
+    #
+    # box_office_list = Listbox(top_window)
+    # box_office_list.grid(row=1, column=1)
+    # box_office_list.insert(3, "Aua")
+    #
+    # top_window.mainloop()
+    #
+    # return
+
     omdb.set_default('tomatoes', True)
 
     manager = GUI_Manager()
@@ -159,29 +196,19 @@ def main():
 
     raw_movies = os.listdir(directory_path)
     movie_list = clean(raw_movies)
-    movies_informations = get_movies_info(movie_list)
+    movies_information = get_movies_info(movie_list)
 
-    movies_ratings = sorted(movies_informations['Ratings'].items(), key=operator.itemgetter(1), reverse=True)
-    movies_box_office = sorted(movies_informations['Box_office'].items(), key=operator.itemgetter(1), reverse=True)
-    movies_not_recognized = movies_informations['Not_recognized']
-
-    print("\nRatings: \n")
-    for movie_rating in movies_ratings:
-        print(movie_rating[0] + ' : ' + str(movie_rating[1]))
-
-    print("\nBox office: \n")
-    for movie_money in movies_box_office:
-        print(movie_money[0] + ' : ' + str(movie_money[1]))
+    movies_not_recognized = movies_information['Not_recognized']
 
     if movies_not_recognized:
         print("\nNot recognized movies: \n")
         for movie_name in movies_not_recognized:
             print (movie_name)
 
-    if not movies_informations:
+    if not movies_information:
         print("No movies were found\nPlease check directory or file names")
 
-    manager.Show_Movie_Informations()
+    manager.Show_Movie_Informations(movies_information)
     input("KEY PRESS:")
 
 
