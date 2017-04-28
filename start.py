@@ -72,62 +72,77 @@ def clean(raw_list):
 
 class GUI_Manager:
 
-    def convert_coordinates_to_string(self, x=0, y=0):
-        coordinates_as_string = "+" + str(self._x_coordinate + x) + "+" + str(self._y_coordinate + y)
+    @staticmethod
+    def convert_coordinates_to_string(x=0, y=0):
+        x = int(x)
+        y = int(y)
+        coordinates_as_string = "+" + str(x) + "+" + str(y)  # Looks like '+500+100'
         return coordinates_as_string
 
     def set_root_window(self):
         self.top_window.withdraw()  # Hide main window. Call deiconify() to make it visible again.
-        self.top_window.geometry(self.convert_coordinates_to_string())
+        self.top_window.geometry(self.convert_coordinates_to_string(x=self._x_coordinate, y=self._y_coordinate))
 
     def set_additional_window(self):
-        # Additional window is created so that label can bind to it. It needs to be a little bit higher then
-        # opening folder Dialog, so the text on label is visible.
-        above_file_dialog_coordinate = - 25
-        self.additional_window.geometry(self.convert_coordinates_to_string(y=above_file_dialog_coordinate))
+        """ 
+        Additional window is created so that label can bind to it. 
+        It needs to be a little bit higher then opening folder Dialog, so the text on label is visible.
+        It could also be placed on center of the screen and have a button "Ok" which would hide it.
+        """
+        screen_width = self.additional_window.winfo_screenwidth()
+        screen_height = self.additional_window.winfo_screenheight()
+        center_screen_place = self.convert_coordinates_to_string(screen_width / 2, screen_height/2)
+        # self.additional_window.geometry(center_screen_place)
+        self.additional_window.geometry("+720+480")
 
-    def set_label_options(self):
-        self.label_options['foreground'] = "blue"
-        self.label_options['background'] = "white"
+        self.additional_window.lift()
+        self.additional_window.attributes("-topmost", True)
 
     def set_browser_options(self):
         self.browser_options['initialdir'] = "C:\\"  # Specifies which directory should be displayed when the dialog pops up.
         self.browser_options['title'] = "Select folder with movies"
 
     def open_folder_browser(self):
-        return tkinter.filedialog.askdirectory(**self.browser_options)
+        self.additional_window = Toplevel()
+        self.set_additional_window()
+        self.label = LabelFactory(self.additional_window, "Please choose a folder with movies.",
+                                   {'foreground': "blue", "background": "white"})
+
+        directory_path = tkinter.filedialog.askdirectory(**self.browser_options)
+        self.additional_window.destroy()
+        return directory_path
 
     def get_folder_path(self):
         self.directory_path = self.open_folder_browser()
         return self.directory_path
 
+    def Show_Movie_Informations(self):
+        self.top_window.deiconify()
+
     def __init__(self):
-        self._x_coordinate = 0
-        self._y_coordinate = 100
+        self._x_coordinate = 900  # Near center ;d TODO: Change it to proper center.
+        self._y_coordinate = 500
 
         self.top_window = tkinter.Tk()
-        self.additional_window = Toplevel()
-        # self.label = Label(self.additional_window, text = "Please choose a folder with movies.",
-        #                    relief = RAISED, padx = 25)
+        self.set_root_window()
 
-        self.label = LabelFactory(self.additional_window, "Please choose a folder with movies",
-                                   {'foreground': "blue", "background": "white"})
+        self.additional_window = None
+        self.label = None
 
         self.browser_options = {}
-
-        self.set_root_window()
-        self.set_additional_window()
-
         self.set_browser_options()
 
         self.directory_path = ""
 
 
-class LabelFactory:
+class LabelFactory(Label):
     def __init__(self, window_to_bind, label_text, options):
-        self.label = Label(window_to_bind, text = label_text)
+        self.label = Label(window_to_bind, text = label_text, relief = RAISED, padx = 25)
         self.label.configure(**options)
         self.label.pack()
+
+
+
 
 
 
@@ -166,12 +181,15 @@ def main():
     if not movies_informations:
         print("No movies were found\nPlease check directory or file names")
 
+    manager.Show_Movie_Informations()
+    input("KEY PRESS:")
+
 
 
 
 if __name__ == '__main__':
     main()
-    input("\n Press any key to exit")
+    #input("\n Press any key to exit")
 
 
 
