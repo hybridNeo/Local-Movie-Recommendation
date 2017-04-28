@@ -94,14 +94,11 @@ class GUI_Manager:
         self.browser_options['initialdir'] = "C:\\"  # Specifies which directory should be displayed when the dialog pops up.
         self.browser_options['title'] = "Select folder with movies"
 
-    def set_label(self):
-        self.label.configure(**self.label_options)
-        self.label.pack()  # This geometry manager organizes widgets in blocks before placing them in the parent widget.
-
     def open_folder_browser(self):
         return tkinter.filedialog.askdirectory(**self.browser_options)
 
     def get_folder_path(self):
+        self.directory_path = self.open_folder_browser()
         return self.directory_path
 
     def __init__(self):
@@ -110,21 +107,28 @@ class GUI_Manager:
 
         self.top_window = tkinter.Tk()
         self.additional_window = Toplevel()
-        self.label = Label(self.additional_window, text = "Please choose a folder with movies.",
-                           relief = RAISED, padx = 25)
+        # self.label = Label(self.additional_window, text = "Please choose a folder with movies.",
+        #                    relief = RAISED, padx = 25)
 
-        self.label_options = {}
+        self.label = LabelFactory(self.additional_window, "Please choose a folder with movies",
+                                   {'foreground': "blue", "background": "white"})
+
         self.browser_options = {}
 
         self.set_root_window()
         self.set_additional_window()
 
-        self.set_label_options()
-        self.set_label()
-
         self.set_browser_options()
 
-        self.directory_path = self.open_folder_browser()
+        self.directory_path = ""
+
+
+class LabelFactory:
+    def __init__(self, window_to_bind, label_text, options):
+        self.label = Label(window_to_bind, text = label_text)
+        self.label.configure(**options)
+        self.label.pack()
+
 
 
 def main():
@@ -139,11 +143,7 @@ def main():
         directory_path = sys.argv[1]
 
     raw_movies = os.listdir(directory_path)
-
-    print('Cleaning.....')
     movie_list = clean(raw_movies)
-
-    print('Retrieving Info... \n \n')
     movies_informations = get_movies_info(movie_list)
 
     movies_ratings = sorted(movies_informations['Ratings'].items(), key=operator.itemgetter(1), reverse=True)
