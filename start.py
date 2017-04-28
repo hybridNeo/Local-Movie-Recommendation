@@ -132,6 +132,13 @@ class GUI_Manager:
 
         self._column += 1
 
+        # Strip string from length, ie: 88 min  -> 88
+        # Sort by length
+        # Add back 'min' string.
+        for movie_name, duration in movies_information['Length'].items():
+            length_purified = int(re.match(r'\d+', duration).group())
+            movies_information['Length'][movie_name] = length_purified
+
         movies_length = sorted(movies_information['Length'].items(), key=operator.itemgetter(1), reverse=True)
         for movie_length in movies_length:
             length_list.insert(END, str(movie_length[0] + ': ' + str(movie_length[1])))
