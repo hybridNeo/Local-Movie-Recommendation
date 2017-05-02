@@ -133,22 +133,50 @@ class GUI_Manager:
         self._column += 1
 
         # Strip string from length, ie: 88 min  -> 88
-        # Sort by length
-        # Add back 'min' string.
         for movie_name, duration in movies_information['Length'].items():
             length_purified = int(re.match(r'\d+', duration).group())
             movies_information['Length'][movie_name] = length_purified
 
         movies_length = sorted(movies_information['Length'].items(), key=operator.itemgetter(1), reverse=True)
-        for movie_length in movies_length:
-            length_list.insert(END, str(movie_length[0] + ': ' + str(movie_length[1])))
 
-    def Show_Movie_Informations(self, movies_information):
+        for movie_length in movies_length:
+            print((movie_length[1]))
+            length_list.insert(END, str(movie_length[0] + ': ' + str(movie_length[1]) + " min."))
+
+    def show_release_date(self, movies_information):
+        release_date_label = Label(self.top_window, text="Release date")
+        release_date_label.grid(row = 0, column = self._column)
+
+        release_date_list = Listbox(self.top_window)
+        release_date_list.grid(row = 1, column = self._column)
+
+        self._column += 1
+
+        movies_release_date = sorted(movies_information['Release_date'].items(), key=operator.itemgetter(1), reverse=True)
+        for release_date in movies_release_date:
+            release_date_list.insert(END, str(release_date[0] + ': ' + str(release_date[1])))
+
+    def show_popularity(self, movies_information):
+        votes_number_label = Label(self.top_window, text="Votes")
+        votes_number_label.grid(row = 0, column = self._column)
+
+        votes_number_list = Listbox(self.top_window)
+        votes_number_list.grid(row = 1, column = self._column)
+
+        self._column += 1
+
+        movies_votes_number = sorted(movies_information['Votes_number'].items(), key=operator.itemgetter(1), reverse=True)
+        for vote in movies_votes_number:
+            votes_number_list.insert(END, str(vote[0] + ': ' + str(vote[1])))
+
+    def show_movie_informations(self, movies_information):
         self.top_window.deiconify()
 
         self.show_ratings(movies_information)
         self.show_box_office(movies_information)
-        self.show_length(movies_information)
+        self.show_length(movies_information)  # Test
+        self.show_release_date(movies_information)  # Test
+        self.show_popularity(movies_information)  # Test
 
         self.top_window.mainloop()
 
@@ -215,7 +243,7 @@ def main():
     if not movies_information:
         print("No movies were found\nPlease check directory or file names")
 
-    manager.Show_Movie_Informations(movies_information)
+    manager.show_movie_informations(movies_information)
     input("KEY PRESS:")
 
 
