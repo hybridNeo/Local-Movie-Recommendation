@@ -132,8 +132,8 @@ class GUI_Manager:
             rating_list.config(width=0)
 
         rating_scroolbar = Scrollbar(self.top_window, command=rating_list.yview)
-        rating_scroolbar.grid(row = 1, column = self._column)
         rating_list.config(yscrollcommand = rating_scroolbar.set)
+        rating_scroolbar.grid(row = 1, column = self._column)
         self._column += 1
 
         movies_ratings = sorted(movies_information['Ratings'].items(), key=operator.itemgetter(1), reverse=True)
@@ -159,9 +159,17 @@ class GUI_Manager:
         length_label.grid(row = 0, column = self._column)
 
         length_list = Listbox(self.top_window)
-        length_list.config(width=0, height=0)
         length_list.grid(row = 1, column = self._column)
+        self._column += 1
 
+        if len(movies_information['Length']) < self.max_elements_before_scrolling:
+            length_list.config(width=0, height=0)  # Resizes tk_listbox to fit content.
+        else:
+            length_list.config(width=0)
+
+        movie_length_scroolbar = Scrollbar(self.top_window, command=length_list.yview)
+        length_list.config(yscrollcommand = movie_length_scroolbar.set)
+        movie_length_scroolbar.grid(row = 1, column = self._column)
         self._column += 1
 
         # Strip string from length, ie: 88 min  -> 88
@@ -180,9 +188,17 @@ class GUI_Manager:
         release_date_label.grid(row = 0, column = self._column)
 
         release_date_list = Listbox(self.top_window)
-        release_date_list.config(width=0, height=0)
         release_date_list.grid(row = 1, column = self._column)
+        self._column += 1
 
+        if len(movies_information['Release_date']) < self.max_elements_before_scrolling:
+            release_date_list.config(width=0, height=0)  # Resizes tk_listbox to fit content.
+        else:
+            release_date_list.config(width=0)
+
+        release_date_scroolbar = Scrollbar(self.top_window, command=release_date_list.yview)
+        release_date_list.config(yscrollcommand = release_date_scroolbar.set)
+        release_date_scroolbar.grid(row = 1, column = self._column)
         self._column += 1
 
         movies_release_date = sort_date(movies_information['Release_date'])
@@ -212,8 +228,17 @@ class GUI_Manager:
         not_recognized_label.grid(row = 0, column = self._column)
 
         not_recognized_list = Listbox(self.top_window)
-        not_recognized_list.config(width=0)
         not_recognized_list.grid(row = 1, column = self._column)
+        self._column += 1
+
+        if len(movies_information['Not_recognized']) < self.max_elements_before_scrolling:
+            not_recognized_list.config(width=0, height=0)  # Resizes tk_listbox to fit content.
+        else:
+            not_recognized_list.config(width=0)
+
+        not_recognized_scroolbar = Scrollbar(self.top_window, command=not_recognized_list.yview)
+        not_recognized_list.config(yscrollcommand = not_recognized_scroolbar.set)
+        not_recognized_scroolbar.grid(row = 1, column = self._column)
 
         self._column += 1
 
@@ -291,10 +316,10 @@ if __name__ == '__main__':
 
 
     '''TO DO: 
-    1. After program gets all ratings, show it in new GUI window.
     2. Make it multithreading, so 1 thread shows GUI in mainloop() and second thread works on everything else.
     3. Allow user to select multiple folders. (tkFileDialog has "multiple" option)
     4. Get size of File Dialog Windows in Windows and make label centered above this dialog. Links below.
+    5. Add sort button, so user can sort best and worst.
     '''
 
     # screen_width = top_window.winfo_screenwidth()
