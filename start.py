@@ -88,7 +88,8 @@ def sort_date(dates):
         dates[date] = dates[date].replace(' ', '-')
 
 
-    sorted_dates = sorted(dates.items(), key=lambda current_date: datetime.datetime.strptime(current_date[1], '%d-%m-%Y'), reverse=True)
+    sorted_dates = sorted(dates.items(), key=lambda current_date: datetime.datetime.strptime(current_date[1],
+                                                                                             '%d-%m-%Y'), reverse=True)
     return sorted_dates
 
 
@@ -122,9 +123,17 @@ class GUI_Manager:
         rating_label.grid(row = 0, column = self._column)
 
         rating_list = Listbox(self.top_window)
-        rating_list.config(width=0, height=0)  # Resizes tk_listbox to fit content.
         rating_list.grid(row = 1, column = self._column)
+        self._column += 1
 
+        if len(movies_information['Ratings']) < self.max_elements_before_scrolling:
+            rating_list.config(width=0, height=0)  # Resizes tk_listbox to fit content.
+        else:
+            rating_list.config(width=0)
+
+        rating_scroolbar = Scrollbar(self.top_window, command=rating_list.yview)
+        rating_scroolbar.grid(row = 1, column = self._column)
+        rating_list.config(yscrollcommand = rating_scroolbar.set)
         self._column += 1
 
         movies_ratings = sorted(movies_information['Ratings'].items(), key=operator.itemgetter(1), reverse=True)
@@ -176,8 +185,6 @@ class GUI_Manager:
 
         self._column += 1
 
-        # '31 May 1996'
-        # sort_date(movies_information['Release_date'])
         movies_release_date = sort_date(movies_information['Release_date'])
         for release_date in movies_release_date:
             release_date_list.insert(END, str(release_date[0] + ': ' + str(release_date[1])))
@@ -192,24 +199,43 @@ class GUI_Manager:
 
         self._column += 1
 
+        # for movie in movies_information['Votes_number']:
+        #     movies_information['Votes_number'][movie] = movies_information['Votes_number'][movie].replace(',', '.')
+        #     movies_information['Votes_number'][movie] = float(movies_information['Votes_number'][movie])
+
         movies_votes_number = sorted(movies_information['Votes_number'].items(), key=operator.itemgetter(1), reverse=True)
         for vote in movies_votes_number:
             votes_number_list.insert(END, str(vote[0] + ': ' + str(vote[1])))
+
+    def show_not_recognized_movies(self, movies_information):
+        not_recognized_label = Label(self.top_window, text="Not recognized")
+        not_recognized_label.grid(row = 0, column = self._column)
+
+        not_recognized_list = Listbox(self.top_window)
+        not_recognized_list.config(width=0)
+        not_recognized_list.grid(row = 1, column = self._column)
+
+        self._column += 1
+
+        for movie_name in movies_information['Not_recognized']:
+            not_recognized_list.insert(END, movie_name)
 
     def show_movie_informations(self, movies_information):
         self.top_window.deiconify()
 
         self.show_ratings(movies_information)
         self.show_length(movies_information)
-        self.show_release_date(movies_information)  # Test
-        self.show_box_office(movies_information)  # TODO: Fix N/A to be last.
-        self.show_popularity(movies_information)  # Test
+        self.show_release_date(movies_information)
+        #self.show_box_office(movies_information)  # TODO: Fix N/A to be last.
+        #self.show_popularity(movies_information)  # TODO: Convert string to float for proper sorting
+        self.show_not_recognized_movies(movies_information)
 
         self.top_window.mainloop()
 
     def __init__(self):
         self._x_coordinate = 900  # Near center ;d TODO: Change it to proper center.
         self._y_coordinate = 500
+        self.max_elements_before_scrolling = 20
 
         self._column = 0
 
@@ -226,26 +252,6 @@ class GUI_Manager:
 
 
 def main():
-    # top_window = Tk()
-    #
-    # rating_label = Label(top_window, text="Ratings")
-    # rating_label.grid(row=0, column=0)
-    #
-    # rating_list = Listbox(top_window)
-    # rating_list.grid(row=1, column=0)
-    # rating_list.insert(1, "Benzema")
-    #
-    # box_office_label = Label(top_window, text="Box Office")
-    # box_office_label.grid(row=0, column=1)
-    #
-    # box_office_list = Listbox(top_window)
-    # box_office_list.grid(row=1, column=1)
-    # box_office_list.insert(3, "Aua")
-    #
-    # top_window.mainloop()
-    #
-    # return
-
     omdb.set_default('tomatoes', True)
 
     manager = GUI_Manager()
