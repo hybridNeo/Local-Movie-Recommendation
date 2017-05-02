@@ -71,8 +71,13 @@ def clean(raw_list):
 
     return movies
 
-# Accepts a dictionary, as {str, str}. 2nd str is date, like: 22 Jun 2007
+#
 def sort_date(dates):
+    """ 
+    :param dates: dictionary in format {str, str}. 2nd str is date, like: 22 Jun 2007
+    We want to transform it to 22-06-2007, and then sort it.
+    :returns: sorted list by dates. 
+    """
     months_mapping = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06', 'Jul': '07',
                      'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'}
 
@@ -83,7 +88,7 @@ def sort_date(dates):
         dates[date] = dates[date].replace(' ', '-')
 
 
-    sorted_dates = sorted(dates.items(), key=lambda date: datetime.datetime.strptime(date[1], '%d-%m-%Y'), reverse=True)
+    sorted_dates = sorted(dates.items(), key=lambda current_date: datetime.datetime.strptime(current_date[1], '%d-%m-%Y'), reverse=True)
     return sorted_dates
 
 
