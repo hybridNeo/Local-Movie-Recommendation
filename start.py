@@ -5,7 +5,7 @@ import glob
 import operator
 import string
 import re
-
+import datetime
 import tkinter
 import tkinter.messagebox
 from tkinter.filedialog import *
@@ -71,6 +71,21 @@ def clean(raw_list):
 
     return movies
 
+# Accepts a dictionary, as {str, str}. 2nd str is date, like: 22 Jun 2007
+def sort_date(dates):
+    months_mapping = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06', 'Jul': '07',
+                     'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'}
+
+    for date in dates:
+        month = re.search(r'([A-z]+)', dates[date])
+        month = month.group()
+        dates[date] = dates[date].replace(month, months_mapping[month])
+        dates[date] = dates[date].replace(' ', '-')
+
+
+    sorted_dates = sorted(dates.items(), key=lambda date: datetime.datetime.strptime(date[1], '%d-%m-%Y'), reverse=True)
+    return sorted_dates
+
 
 class GUI_Manager:
 
@@ -102,6 +117,7 @@ class GUI_Manager:
         rating_label.grid(row = 0, column = self._column)
 
         rating_list = Listbox(self.top_window)
+        rating_list.config(width=0, height=0)  # Resizes tk_listbox to fit content.
         rating_list.grid(row = 1, column = self._column)
 
         self._column += 1
@@ -115,6 +131,7 @@ class GUI_Manager:
         box_office_label.grid(row = 0, column = self._column)
 
         box_office_list = Listbox(self.top_window)
+        box_office_list.config(width=0, height=0)
         box_office_list.grid(row = 1, column = self._column)
 
         self._column += 1
@@ -128,6 +145,7 @@ class GUI_Manager:
         length_label.grid(row = 0, column = self._column)
 
         length_list = Listbox(self.top_window)
+        length_list.config(width=0, height=0)
         length_list.grid(row = 1, column = self._column)
 
         self._column += 1
@@ -148,11 +166,14 @@ class GUI_Manager:
         release_date_label.grid(row = 0, column = self._column)
 
         release_date_list = Listbox(self.top_window)
+        release_date_list.config(width=0, height=0)
         release_date_list.grid(row = 1, column = self._column)
 
         self._column += 1
 
-        movies_release_date = sorted(movies_information['Release_date'].items(), key=operator.itemgetter(1), reverse=True)
+        # '31 May 1996'
+        # sort_date(movies_information['Release_date'])
+        movies_release_date = sort_date(movies_information['Release_date'])
         for release_date in movies_release_date:
             release_date_list.insert(END, str(release_date[0] + ': ' + str(release_date[1])))
 
@@ -161,6 +182,7 @@ class GUI_Manager:
         votes_number_label.grid(row = 0, column = self._column)
 
         votes_number_list = Listbox(self.top_window)
+        votes_number_list.config(width=0, height=0)
         votes_number_list.grid(row = 1, column = self._column)
 
         self._column += 1
@@ -173,9 +195,9 @@ class GUI_Manager:
         self.top_window.deiconify()
 
         self.show_ratings(movies_information)
-        self.show_box_office(movies_information)
-        self.show_length(movies_information)  # Test
+        self.show_length(movies_information)
         self.show_release_date(movies_information)  # Test
+        self.show_box_office(movies_information)  # TODO: Fix N/A to be last.
         self.show_popularity(movies_information)  # Test
 
         self.top_window.mainloop()
@@ -244,7 +266,7 @@ def main():
         print("No movies were found\nPlease check directory or file names")
 
     manager.show_movie_informations(movies_information)
-    input("KEY PRESS:")
+#    input("KEY PRESS:")
 
 
 
