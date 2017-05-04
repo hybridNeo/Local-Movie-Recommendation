@@ -30,14 +30,14 @@ def get_movies_info(movie_list, top_window):
     full_title = {}
     movies_not_recognized = []
 
-    text = Text(top_window)
-    text.config(width=len("Analyzing:"), height = 10)
-    text.grid()
+    current_movie_indicator = Text(top_window)
+    current_movie_indicator.config(width=30, height = 5)
+    current_movie_indicator.grid()
     top_window.update_idletasks()
 
     err_cnt = 0
     for movie_name in movie_list:
-        text.insert(END, "Analyzing: " + movie_name)
+        current_movie_indicator.insert(END, "Analyzing: " + movie_name)
         top_window.update_idletasks()
 
         try:
@@ -52,13 +52,13 @@ def get_movies_info(movie_list, top_window):
             else:
                 movies_not_recognized.append(movie_name)
 
-            text.delete("1.0", END)
+            current_movie_indicator.delete("1.0", END)
         except:
             err_cnt += 1
 
     movie_informations = {'Ratings': ratings, 'Box_office': box_office, 'Release_date': release_date, 'Length': length,
                            'Votes_number': votes_number, 'Full_title': full_title, 'Not_recognized': movies_not_recognized}
-    text.destroy()
+    current_movie_indicator.destroy()
     return movie_informations
 
 
@@ -107,16 +107,14 @@ def sort_date(dates):
 
 
 class GUI_Manager:
-
-    @staticmethod
-    def convert_coordinates_to_string(x=0, y=0):
-        x = int(x)
-        y = int(y)
-        coordinates_as_string = "+" + str(x) + "+" + str(y)  # Looks like '+500+100'
-        return coordinates_as_string
-
-    def set_root_window(self):
-        self.top_window.geometry(self.convert_coordinates_to_string(x=self._x_coordinate, y=self._y_coordinate))
+    def set_root_window_to_center(self):
+        width = self.top_window.winfo_reqwidth()
+        height = self.top_window.winfo_reqheight()
+        screen_width = self.top_window.winfo_screenwidth()
+        screen_height = self.top_window.winfo_screenheight()
+        x = (screen_width / 2) - (width / 2)
+        y = (screen_height / 2) - (height / 2)
+        self.top_window.geometry('+%d+%d' % (x, y))
 
     def set_browser_options(self):
         self.browser_options['initialdir'] = "C:\\"  # Specifies which directory should be displayed when the dialog pops up.
@@ -261,25 +259,34 @@ class GUI_Manager:
         for movie_name in movies_information['Not_recognized']:
             not_recognized_list.insert(END, movie_name)
 
+    def show_no_movies_found(self):
+        error_text_widget = Text(self.top_window)
+        error_text = "Found no movies in directory: " + self.directory_path
+        error_text_widget.config(width = len(error_text), height = 5)
+        error_text_widget.grid()
+        error_text_widget.insert(INSERT, error_text)
+        self.top_window.mainloop()
+
+
     def show_movie_informations(self, movies_information):
-        self.show_ratings(movies_information)
-        self.show_length(movies_information)
-        self.show_release_date(movies_information)
-        #self.show_box_office(movies_information)  # TODO: Fix N/A to be last.
-        #self.show_popularity(movies_information)  # TODO: Convert string to float for proper sorting
-        self.show_not_recognized_movies(movies_information)
+        if len(movies_information['Ratings']) != 0 or len(movies_information['Not_recognized']) != 0:
+            self.show_ratings(movies_information)
+            self.show_length(movies_information)
+            self.show_release_date(movies_information)
+            #self.show_box_office(movies_information)  # TODO: Fix N/A to be last.
+            #self.show_popularity(movies_information)  # TODO: Convert string to float for proper sorting
+            self.show_not_recognized_movies(movies_information)
+        else:
+            self.show_no_movies_found()
 
         self.top_window.mainloop()
 
     def __init__(self):
-        self._x_coordinate = 900  # Near center ;d TODO: Change it to proper center.
-        self._y_coordinate = 500
         self.max_elements_before_scrolling = 20
-
         self._column = 0
 
         self.top_window = tkinter.Tk()
-        self.set_root_window()
+        self.set_root_window_to_center()
 
         self.browser_options = {}
         self.set_browser_options()
@@ -311,23 +318,7 @@ if __name__ == '__main__':
     main()
     #input("\n Press any key to exit")
 
-
-
-
-
-    '''TO DO: 
-    2. Make it multithreading, so 1 thread shows GUI in mainloop() and second thread works on everything else.
-    3. Allow user to select multiple folders. (tkFileDialog has "multiple" option)
-    4. Get size of File Dialog Windows in Windows and make label centered above this dialog. Links below.
-    5. Add sort button, so user can sort best and worst.
-    '''
-
-    # screen_width = top_window.winfo_screenwidth()
-    # screen_height = top_window.winfo_screenheight()
-    # top_window.geometry('%dx%d+%d+%d' % (screen_width, screen_height, x_coordinate, y_coordinate))
-
-
-''' 
+'''
 The package Tkinter has been renamed to tkinter in Python 3, as well as other modules related to it. 
 Here are the name changes:
 
@@ -343,16 +334,3 @@ ScrolledText → tkinter.scrolledtext
 Tix → tkinter.tix
 ttk → tkinter.ttk
 '''
-
-''' 
-Causing a widget to appear requires that you position it using with what Tkinter calls "geometry managers". 
-The three managers are grid, pack and place.
-'''
-# label.grid(row = 50, column = 1000)  # This geometry manager organizes widgets in a table-like structure in the parent widget.
-# label.place(x = 1)
-
- # https://bytes.com/topic/python/answers/908537-can-window-size-tffiledialog-changed
- # http://stackoverflow.com/questions/21558028/how-to-change-window-size-of-tkfiledialog-askdirectory
-
-
-
