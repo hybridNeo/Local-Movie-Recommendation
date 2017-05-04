@@ -21,7 +21,7 @@ reserved_keywords = ['EXTENDED', 'REMASTERED', 'DIRECTORS', 'UNRATED', 'AlTERNAT
 reserved_other = ['[]', '-aXXo']
 
 
-def get_movies_info(movie_list):
+def get_movies_info(movie_list, top_window):
     ratings = {}
     box_office = {}
     release_date = {}
@@ -30,8 +30,16 @@ def get_movies_info(movie_list):
     full_title = {}
     movies_not_recognized = []
 
+    text = Text(top_window)
+    text.config(width=len("Analyzing:"), height = 10)
+    text.grid()
+    top_window.update_idletasks()
+
     err_cnt = 0
     for movie_name in movie_list:
+        text.insert(END, "Analyzing: " + movie_name)
+        top_window.update_idletasks()
+
         try:
             movie = omdb.title(movie_name)
             if movie:
@@ -43,11 +51,14 @@ def get_movies_info(movie_list):
                 full_title[movie_name] = movie.title
             else:
                 movies_not_recognized.append(movie_name)
+
+            text.delete("1.0", END)
         except:
             err_cnt += 1
 
     movie_informations = {'Ratings': ratings, 'Box_office': box_office, 'Release_date': release_date, 'Length': length,
                            'Votes_number': votes_number, 'Full_title': full_title, 'Not_recognized': movies_not_recognized}
+    text.destroy()
     return movie_informations
 
 
@@ -71,7 +82,7 @@ def clean(raw_list):
 
     return movies
 
-#
+
 def sort_date(dates):
     """ 
     :param dates: dictionary in format {str, str}. 2nd str is date, like: 22 Jun 2007
@@ -81,12 +92,14 @@ def sort_date(dates):
     months_mapping = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06', 'Jul': '07',
                      'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'}
 
-    for date in dates:
-        month = re.search(r'([A-z]+)', dates[date])
-        month = month.group()
-        dates[date] = dates[date].replace(month, months_mapping[month])
-        dates[date] = dates[date].replace(' ', '-')
-
+    for movie_name in dates:
+        if dates[movie_name] != 'N/A':
+            month = re.search(r'([A-z]+)', dates[movie_name])
+            month = month.group()
+            dates[movie_name] = dates[movie_name].replace(month, months_mapping[month])
+            dates[movie_name] = dates[movie_name].replace(' ', '-')
+        else:
+            dates[movie_name] = '1-01-1000'
 
     sorted_dates = sorted(dates.items(), key=lambda current_date: datetime.datetime.strptime(current_date[1],
                                                                                              '%d-%m-%Y'), reverse=True)
@@ -103,7 +116,6 @@ class GUI_Manager:
         return coordinates_as_string
 
     def set_root_window(self):
-        self.top_window.withdraw()  # Hide main window. Call deiconify() to make it visible again.
         self.top_window.geometry(self.convert_coordinates_to_string(x=self._x_coordinate, y=self._y_coordinate))
 
     def set_browser_options(self):
@@ -174,8 +186,12 @@ class GUI_Manager:
 
         # Strip string from length, ie: 88 min  -> 88
         for movie_name, duration in movies_information['Length'].items():
-            length_purified = int(re.match(r'\d+', duration).group())
-            movies_information['Length'][movie_name] = length_purified
+            print(movie_name)
+            if duration != 'N/A':
+                length_purified = int(re.match(r'\d+', duration).group())
+                movies_information['Length'][movie_name] = length_purified
+            else:
+                movies_information['Length'][movie_name] = -1
 
         movies_length = sorted(movies_information['Length'].items(), key=operator.itemgetter(1), reverse=True)
 
@@ -246,8 +262,6 @@ class GUI_Manager:
             not_recognized_list.insert(END, movie_name)
 
     def show_movie_informations(self, movies_information):
-        self.top_window.deiconify()
-
         self.show_ratings(movies_information)
         self.show_length(movies_information)
         self.show_release_date(movies_information)
@@ -273,9 +287,6 @@ class GUI_Manager:
         self.directory_path = ""
 
 
-
-
-
 def main():
     omdb.set_default('tomatoes', True)
 
@@ -289,23 +300,12 @@ def main():
 
     raw_movies = os.listdir(directory_path)
     movie_list = clean(raw_movies)
-    movies_information = get_movies_info(movie_list)
-
-    movies_not_recognized = movies_information['Not_recognized']
-
-    if movies_not_recognized:
-        print("\nNot recognized movies: \n")
-        for movie_name in movies_not_recognized:
-            print (movie_name)
+    movies_information = get_movies_info(movie_list, manager.top_window)
 
     if not movies_information:
         print("No movies were found\nPlease check directory or file names")
 
     manager.show_movie_informations(movies_information)
-#    input("KEY PRESS:")
-
-
-
 
 if __name__ == '__main__':
     main()
