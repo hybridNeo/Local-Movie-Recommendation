@@ -269,14 +269,15 @@ class GUI_Manager:
 
 
     def show_movie_informations(self, movies_information):
-        if len(movies_information['Ratings']) != 0 or len(movies_information['Not_recognized']) != 0:
+        if len(movies_information['Ratings']) > 0:
             self.show_ratings(movies_information)
             self.show_length(movies_information)
             self.show_release_date(movies_information)
             #self.show_box_office(movies_information)  # TODO: Fix N/A to be last.
             #self.show_popularity(movies_information)  # TODO: Convert string to float for proper sorting
+        if len(movies_information['Not_recognized']) > 0:
             self.show_not_recognized_movies(movies_information)
-        else:
+        if len(movies_information['Ratings']) == 0 and len(movies_information['Not_recognized']) == 0:
             self.show_no_movies_found()
 
         self.top_window.mainloop()
