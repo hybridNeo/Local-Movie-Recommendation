@@ -311,13 +311,13 @@ def main():
     movies_information = get_movies_info(movie_list, manager.top_window)
 
     if not movies_information:
-        print("No movies were found\nPlease check directory or file names")
+        print("No movies were found.\nPlease check directory or file names.")
 
     manager.show_movie_informations(movies_information)
 
 if __name__ == '__main__':
     main()
-    #input("\n Press any key to exit")
+    input("\n Press any key to exit.")
 
 '''
 The package Tkinter has been renamed to tkinter in Python 3, as well as other modules related to it. 
