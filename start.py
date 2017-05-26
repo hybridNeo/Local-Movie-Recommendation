@@ -35,7 +35,6 @@ def get_movies_info(movie_list, top_window):
     current_movie_indicator.grid()
     top_window.update_idletasks()
 
-    err_cnt = 0
     for movie_name in movie_list:
         current_movie_indicator.insert(END, "Analyzing: " + movie_name)
         top_window.update_idletasks()
@@ -53,8 +52,8 @@ def get_movies_info(movie_list, top_window):
                 movies_not_recognized.append(movie_name)
 
             current_movie_indicator.delete("1.0", END)
-        except:
-            err_cnt += 1
+        except Exception as exception:
+            print("Exception error: " + str(exception))
 
     movie_informations = {'Ratings': ratings, 'Box_office': box_office, 'Release_date': release_date, 'Length': length,
                            'Votes_number': votes_number, 'Full_title': full_title, 'Not_recognized': movies_not_recognized}
